@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 def obtener_estado_servidor(html):
     soup = BeautifulSoup(html, 'html.parser')
     etiqueta_estado = soup.find('div', class_='ui small bottom right attached label')
-    
     if etiqueta_estado and 'Stopped' in etiqueta_estado.text:
         return 'Apagado'
     etiqueta_ip = soup.find('div', class_='center aligned content')
@@ -36,7 +35,7 @@ def server():
     driver.get("https://hostfactor.io/")  # Reemplaza con la URL real de tu sitio web
 
     # Espera a que aparezca el botón "Log In"
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 20)
     login_button = wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Log In')]")))
 
     # Haz clic en el botón "Log In" para abrir el popup
@@ -74,15 +73,9 @@ def server():
     cards_elements[0].click()
 
     # Esperar a que aparezca el botón "Start" en el popup (aumentamos el tiempo de espera)
-    try:
-        start_button = WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Start')]"))
-        )
-        # Hacer clic en el botón "Start"
-        start_button.click()
-    except Exception:
-        j = 0
+    
     # Obtener el outerHTML de la primera "card"
+    time.sleep(10)
     html_del_elemento = cards_elements[0].get_attribute("outerHTML")
 
     # Prueba con los dos fragmentos de HTML
@@ -91,9 +84,15 @@ def server():
     if estado_funcionando == 'Apagado' : 
         if int(input('Quieres inciar el servidor?: \n1. Si\n0.No\n')) == 1:
             print('Server inciandose...')
+            try:
+                start_button = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Start')]"))
+                )
+                # Hacer clic en el botón "Start"
+                start_button.click()
+            except Exception:
+                j = 0
             server()
-
     # Cierra el navegador cuando hayas terminado
     driver.quit()
-
 server()
